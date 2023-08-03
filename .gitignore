@@ -1,0 +1,12 @@
+*.jpg
+*.jpeg
+*.mp4
+*.mkv
+*.png
+node_modules/
+*.json
+*.zip
+.wwebjs_cache/
+.wwebjs_auth/
+
+
