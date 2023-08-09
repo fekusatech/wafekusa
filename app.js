@@ -592,10 +592,11 @@ client.on('message', async msg => {
         });
     }
     await saveMessage(msg);
+	let author = msg._data.notifyName;
     let contact = msg.from;
     let contactnya = contact.replace('@c.us', '');
     let thismsg = encodeURIComponent(msg.body);
-    let url = callback_server + "webhookapi.php?nomor=" + contactnya + "&msg=" + thismsg + "&port=" + port;
+    let url = callback_server + "webhookapi.php?nomor=" + contactnya + "&msg=" + thismsg + "&port=" + port + "&author=" + author;
     https.get(url, (res) => {
         let body = "";
         res.on("data", (chunk) => {
