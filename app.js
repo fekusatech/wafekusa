@@ -14,7 +14,9 @@ const qrcode_url = require('qrcode');
 const fs = require('fs');
 const http = require('http');
 const https = require('https');
-//https.globalAgent.options.rejectUnauthorized = false
+const dotenv = require('dotenv');
+dotenv.config();
+
 const request = require('request');
 const glob = require("glob");
 const {
@@ -26,19 +28,19 @@ const {
 } = require('./helpers/formatter');
 const fileUpload = require('express-fileupload');
 const axios = require('axios');
-const port = process.env.PORT || 4003;
+const port = process.env.PORT;
 const bodyParser = require('body-parser')
 const jsonParser = bodyParser.json()
 const app = express();
 const server = http.createServer(app);
 const start_ping = new Date();
-const con = require('./wadb-mea.ts');
+const con = require('./wadb-example.ts');
 const myArgs = process.argv.slice(2);
 const wa_files_folder = "./assets/images/whatsapp/message/";
 let status = "NOT READY";
 let qrcode_return = null;
 let datauser = null;
-const callback_server = "https://appdmc.com/api/";
+const callback_server = process.env.WEBHOOKDOMAIN;
 app.use(express.json());
 app.use(express.urlencoded({
     extended: true
@@ -497,14 +499,14 @@ client.on('message', async msg => {
     console.log('MESSAGE RECEIVED', msg);
     if (msg.body === 'grouplist') {
         client.getChats().then(chats => {
-             const groups = chats.filter(chat => chat.isGroup);
- 
-             if (groups.length == 0) {
-                 msg.reply('You have no group yet.');
-             } else {
-                 let replyMsg = '*YOUR GROUPS*\n\n';
-                 groups.forEach((group, i) => {
-                     replyMsg += `
+            const groups = chats.filter(chat => chat.isGroup);
+
+            if (groups.length == 0) {
+                msg.reply('You have no group yet.');
+            } else {
+                let replyMsg = '*YOUR GROUPS*\n\n';
+                groups.forEach((group, i) => {
+                    replyMsg += `
                      *Group Details*
                      ID: ${group.id._serialized}
                      Name: ${group.name}
@@ -512,11 +514,26 @@ client.on('message', async msg => {
                      Created At: ${group.createdAt.toString()}
                      Created By: ${group.owner.user}
                      Participant count: ${group.participants.length}`;
-                 });
-                 replyMsg += '_You can use the group id to send a message to the group._'
-                 msg.reply(replyMsg);
-             }
-         }); 
+                });
+                replyMsg += '_You can use the group id to send a message to the group._'
+                msg.reply(replyMsg);
+            }
+        });
+    } else if (msg.body === '!groupinfo') {
+        let chat = await msg.getChat();
+        if (chat.isGroup) {
+            msg.reply(`
+                *Group Details*
+                Id: ${chat.id._serialized}
+                Name: ${chat.name}
+                Description: ${chat.description}
+                Created At: ${chat.createdAt.toString()}
+                Created By: ${chat.owner.user}
+                Participant count: ${chat.participants.length}
+            `);
+        } else {
+            msg.reply('This command can only be used in a group!');
+        }
     } else if (msg.body === '!b') {
         client.info.getBatteryStatus().then((number) => {
             const obj = JSON.parse(JSON.stringify(number));
@@ -592,11 +609,11 @@ client.on('message', async msg => {
         });
     }
     await saveMessage(msg);
-	let author = msg._data.notifyName;
+    let author = msg._data.notifyName;
     let contact = msg.from;
     let contactnya = contact.replace('@c.us', '');
     let thismsg = encodeURIComponent(msg.body);
-    let url = callback_server + "webhookapi.php?nomor=" + contactnya + "&msg=" + thismsg + "&port=" + port + "&author=" + author;
+    let url = callback_server + "webhook.php?nomor=" + contactnya + "&msg=" + thismsg + "&port=" + port + "&author=" + author;
     https.get(url, (res) => {
         let body = "";
         res.on("data", (chunk) => {
