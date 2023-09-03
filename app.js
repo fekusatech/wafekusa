@@ -41,6 +41,7 @@ let status = "NOT READY";
 let qrcode_return = null;
 let datauser = null;
 const callback_server = process.env.WEBHOOKDOMAIN;
+const callback_file = process.env.CALLBACKFILE;
 app.use(express.json());
 app.use(express.urlencoded({
     extended: true
@@ -613,7 +614,7 @@ client.on('message', async msg => {
     let contact = msg.from;
     let contactnya = contact.replace('@c.us', '');
     let thismsg = encodeURIComponent(msg.body);
-    let url = callback_server + "webhook.php?nomor=" + contactnya + "&msg=" + thismsg + "&port=" + port + "&author=" + author;
+    let url = callback_server + callback_file +"?nomor=" + contactnya + "&msg=" + thismsg + "&port=" + port + "&author=" + author;
     https.get(url, (res) => {
         let body = "";
         res.on("data", (chunk) => {
