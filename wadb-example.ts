@@ -1,11 +1,11 @@
 var mysql = require('mysql');
 
 var con = mysql.createPool({
-  host: 'host',
+  host: '103.150.190.16',
   port: '3306',
-  database : 'database',
-  user: 'user',
-  password: 'password',
+  database : 'db_waku',
+  user: 'db_waku',
+  password: 'db_waku',
   charset : 'utf8mb4'
 });
 

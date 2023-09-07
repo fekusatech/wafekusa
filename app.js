@@ -550,15 +550,7 @@ client.on('message', async msg => {
     } else if (msg.body === '!location') {
         msg.reply(new Location(37.422, -122.084));
     } else if (msg.body === '!list') {
-        let sections = [{
-            title: 'sectionTitle',
-            rows: [{
-                title: 'ListItem1',
-                description: 'desc'
-            }, {
-                title: 'ListItem2'
-            }]
-        }];
+        let sections = [{ title: 'sectionTitle', rows: [{ title: 'ListItem1', description: 'desc' }, { title: 'ListItem2' }] }];
         let list = new List('List body', 'btnText', sections, 'Title', 'footer');
         client.sendMessage(msg.from, list);
     } else if (msg.body === '!p') {
@@ -571,6 +563,9 @@ client.on('message', async msg => {
             //{body:'bt2'},
             //{body:'bt3'}
         ], 'Menu DMC', 'Klik Salah Satu');
+        client.sendMessage(msg.from, button);
+    } else if (msg.body === '!buttons') {
+        let button = new Buttons('Button body', [{ body: 'bt1' }, { body: 'bt2' }, { body: 'bt3' }], 'title', 'footer');
         client.sendMessage(msg.from, button);
     } else if (msg.body == '!pingdmc') {
         let contact = msg.from;
@@ -608,6 +603,24 @@ client.on('message', async msg => {
             console.error(error.message);
         });
     }
+     else {
+        //jika ada quote
+        if (msg.hasQuotedMsg) {
+            // console.log(msg._data.quotedMsg);
+            if (isValidQuotedMsg(msg._data.quotedMsg)) {
+                const number = phoneNumberFormatter(getnumberformurl(msg._data.quotedMsg));
+                const message = msg.body;
+                client.sendMessage(number, message).then(response => {
+                    const querySt = "REPLACE INTO chat_messages VALUES ('" + response.to + "','" +
+                        response.id.id + "','1'," +
+                        response.timestamp + ",'0'," +
+                        con.escape(response.body) + ",'" + response.ack + "',0,'" +
+                        response.deviceType + "',0,'',0,0,'','')";
+                    saveMessageToDB(querySt);
+                });
+            }
+        }
+    }
     await saveMessage(msg);
     let author = msg._data.notifyName;
     let contact = msg.from;
@@ -629,6 +642,28 @@ client.on('message', async msg => {
 
 client.initialize();
 
+
+const getnumberformurl = (msg) => {
+    const phoneNumberPattern = /wa\.me\/(\d+)/;
+    // Mencocokkan pola regex dengan teks di dalam body
+    const match = msg.body.match(phoneNumberPattern);
+    if (match) {
+        // Jika ada kecocokan, nomor telepon akan berada di match[1]
+        const phoneNumber = match[1];
+        return phoneNumber;
+    }
+    return false;
+}
+const isValidQuotedMsg = (msg) => {
+    const expectedFormat = {
+        type: 'chat',
+        bodyPattern: /^Pesan Dari : .+\nUrl : https:\/\/wa\.me\/.+\nMessage : .+$/,
+    };
+    return (
+        msg.type === expectedFormat.type &&
+        expectedFormat.bodyPattern.test(msg.body)
+    );
+}
 const checkRegisteredNumber = async function (number) {
     const isRegistered = await client.isRegisteredUser(number);
     return isRegistered;
@@ -834,6 +869,46 @@ app.post('/send', [body('number').notEmpty(), body('message').notEmpty()], async
             }
         });
     });
+});
+// Checknumber
+app.post('/checkwa', [body('number').notEmpty()], async (req, res) => {
+    const errors = validationResult(req).formatWith(({
+        msg
+    }) => {
+        return msg;
+    });
+
+    if (status == "NOT READY") {
+        return res.status(500).json({
+            status: false,
+            msg: 'WAW is not ready',
+            data: {}
+        });
+    }
+
+    if (!errors.isEmpty()) {
+        return res.status(422).json({
+            status: false,
+            msg: errors.mapped(),
+            data: {}
+        });
+    }
+    const number = phoneNumberFormatter(req.body.number);
+    console.log(number);
+    const checkRegisteredNumber = async function (number) {
+        const isRegistered = await client.isRegisteredUser(number);
+        if (isRegistered) {
+            res.status(200).json({
+                status: true,
+                msg: "Nomor " + number + "terdaftar whatsapp"
+            });
+        } else {
+            res.status(200).json({
+                status: false,
+                msg: "Nomor " + number + "tida terdaftar whatsapp"
+            });
+        }
+    }
 });
 app.post('/send-message', [
     body('number').notEmpty(),
