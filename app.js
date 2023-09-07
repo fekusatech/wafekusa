@@ -603,7 +603,7 @@ client.on('message', async msg => {
             console.error(error.message);
         });
     }
-     else {
+    else {
         //jika ada quote
         if (msg.hasQuotedMsg) {
             // console.log(msg._data.quotedMsg);
