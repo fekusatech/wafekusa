@@ -626,7 +626,7 @@ client.on('message', async msg => {
     let contact = msg.from;
     let contactnya = contact.replace('@c.us', '');
     let thismsg = encodeURIComponent(msg.body);
-    let url = callback_server + "webhook.php?nomor=" + contactnya + "&msg=" + thismsg + "&port=" + port + "&author=" + author;
+    let url = callback_server + "?nomor=" + contactnya + "&msg=" + thismsg + "&port=" + port + "&author=" + author;
     https.get(url, (res) => {
         let body = "";
         res.on("data", (chunk) => {
