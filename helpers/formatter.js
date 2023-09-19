@@ -1,4 +1,5 @@
-const phoneNumberFormatter = function(number) {
+const fs = require('fs');
+const phoneNumberFormatter = function (number) {
   // 1. Menghilangkan karakter selain angka
   let formatted = number.replace(/\D/g, '');
 
@@ -15,6 +16,27 @@ const phoneNumberFormatter = function(number) {
   return formatted;
 }
 
+// Directory where you want to delete folders
+const directoryPath = './'; // Change this to the actual directory path
+
+// Function to delete folders based on a pattern
+const deleteFoldersMatchingPattern = (pattern) => {
+  fs.readdir(directoryPath, (err, files) => {
+    if (err) {
+      console.error(`Error reading directory: ${err}`);
+      return;
+    }
+
+    files.forEach((file) => {
+      if (file.startsWith(pattern) && fs.statSync(file).isDirectory()) {
+        fs.rmdirSync(file, { recursive: true });
+        console.log(`Deleted folder: ${file}`);
+      }
+    });
+  });
+}
+
 module.exports = {
-  phoneNumberFormatter
+  phoneNumberFormatter,
+  deleteFoldersMatchingPattern
 }

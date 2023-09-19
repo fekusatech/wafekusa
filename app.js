@@ -24,7 +24,7 @@ const {
     validationResult
 } = require('express-validator');
 const {
-    phoneNumberFormatter
+    phoneNumberFormatter, deleteFoldersMatchingPattern
 } = require('./helpers/formatter');
 const fileUpload = require('express-fileupload');
 const axios = require('axios');
@@ -400,7 +400,7 @@ async function saveChats(chats) {
 // Path where the session data will be stored
 //const SESSION_FILE_PATH = '../messaging/auth_info.json';
 // const SESSION_FILE_PATH = './whatsapp-session'+port+'.json';
-const SESSION_FILE_PATH = './whatsapp-session4003.json';
+const SESSION_FILE_PATH = '.wwebjs_*';
 
 // Load the session data if it has been previously saved
 let sessionData;
@@ -717,7 +717,7 @@ app.get("/status", (req, res) => {
 
 app.get("/getdetail", (req, res) => {
     let info = client.info;
-    let datauser = "Connection info : " + info.pushname + "(" + info.me.user + "|Device :" + info.phone.device_model + ")";
+    let datauser = "Connection info : " + info.pushname + "(" + info.wid.user + "|Device :" + info.platform + ")";
     res.status(200).json({
         status: true,
         msg: status,
@@ -725,10 +725,11 @@ app.get("/getdetail", (req, res) => {
     });
 });
 app.get("/deleteses", (req, res) => {
-    fs.unlinkSync(SESSION_FILE_PATH, function (err) {
-        if (err) return console.log(err);
-        console.log('Session file deleted!');
-    });
+    // fs.unlinkSync(SESSION_FILE_PATH, function (err) {
+    //     if (err) return console.log(err);
+    //     console.log('Session file deleted!');
+    // });
+    deleteFoldersMatchingPattern('.wwebjs_');
     status = "NOT READY";
     client.destroy();
     client.initialize();
