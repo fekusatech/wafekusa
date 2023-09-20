@@ -464,13 +464,13 @@ client.on('change_state', state => {
 });
 client.on('ready', async () => {
     status = "READY";
-    // const chats = await client.getChats()
-    //   .then(response => saveChats(response));
+    const chats = await client.getChats()
+        .then(response => saveChats(response));
     console.log('Client is ready!');
-    //let sContacts = await client.getContacts()
-    //.then(response=>console.log(response.length));
-    //.then(response=>console.log(response));
-    //    .then(response => getContacts(response));
+    let sContacts = await client.getContacts()
+        //.then(response=>console.log(response.length));
+        //.then(response=>console.log(response));
+        .then(response => getContacts(response));
 });
 
 // Save session values to the file upon successful auth
