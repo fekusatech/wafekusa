@@ -1,17 +1,12 @@
-*.jpg
-*.jpeg
-*.mp4
-*.mkv
-*.png
-node_modules/
-*.zip
-.wwebjs_cache/
-.wwebjs_auth/
-*.sql
-wadb-mea.ts
-*.pdf
-*.x-rar*
-*.vnd*
-*.webp
-*.ogg
+# IDE Files
+#-------------------------
+/nbproject/
+.idea/*
+
+## Sublime Text cache files
+*.tmlanguage.cache
+*.tmPreferences.cache
+*.stTheme.cache
+*.sublime-workspace
+*.sublime-project
 
