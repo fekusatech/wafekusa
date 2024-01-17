@@ -1,0 +1,17 @@
+*.jpg
+*.jpeg
+*.mp4
+*.mkv
+*.png
+node_modules/
+*.zip
+.wwebjs_cache/
+.wwebjs_auth/
+*.sql
+wadb-mea.ts
+*.pdf
+*.x-rar*
+*.vnd*
+*.webp
+*.ogg
+
